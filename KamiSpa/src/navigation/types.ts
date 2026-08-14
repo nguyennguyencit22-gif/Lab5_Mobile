@@ -9,6 +9,7 @@ export type BottomTabParamList = {
 
 export type RootStackParamlist = {
     Login: undefined;
+    MainTabs: undefined;
     Home: undefined;
     AddService: undefined;
 
@@ -19,4 +20,8 @@ export type RootStackParamlist = {
     EditService: {
         service: Service;
     };
+
+    AddCustomer: undefined;
+
+    TransactionDetail: { transactionId: string };
 };

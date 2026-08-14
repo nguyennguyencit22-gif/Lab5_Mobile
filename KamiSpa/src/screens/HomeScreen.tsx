@@ -1,5 +1,4 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamlist } from "../navigation/types";
+import { BottomTabParamList } from "../navigation/types";
 import { useCallback, useState } from "react";
 import { Service } from "../models/Service";
 import { getAllService } from "../services/serviceService";
@@ -11,8 +10,12 @@ import { COLORS } from "../constants/colors";
 import { FlatList } from "react-native";
 import { RefreshControl } from "react-native";
 import ServiceItem from "./ServiceItem";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
-type Props = NativeStackScreenProps<RootStackParamlist, 'Home'>;
+type Props = BottomTabScreenProps<
+    BottomTabParamList,
+    'HomeTab'
+>;
 
 const HomeScreen = ({ navigation }: Props) => {
 
@@ -78,7 +81,7 @@ const HomeScreen = ({ navigation }: Props) => {
                 </Text>
                 <Pressable
                     style={styles.addButton}
-                    onPress={() => navigation.navigate('AddService')}>
+                    onPress={() => navigation.getParent()?.navigate('AddService')}>
                     <Text style={styles.addText}>
                         +
                     </Text>
@@ -103,12 +106,13 @@ const HomeScreen = ({ navigation }: Props) => {
                 renderItem={({ item }) => (
                     <ServiceItem
                         service={item}
-                        onPress={() => navigation.navigate(
-                            'ServiceDetail',
-                            {
-                                serviceId: item._id
-                            }
-                        )} />
+                        onPress={() => navigation.getParent()
+                            ?.navigate(
+                                'ServiceDetail',
+                                {
+                                    serviceId: item._id
+                                }
+                            )} />
                 )
                 }
             />

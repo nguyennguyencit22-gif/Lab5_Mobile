@@ -36,7 +36,7 @@ const LoginScreen = ({ navigation }: Props) => {
             const token = await getToken();
 
             if (token) {
-                navigation.replace('Home');
+                navigation.replace('MainTabs');
             }
         };
         checkStoredToken();
@@ -73,7 +73,7 @@ const LoginScreen = ({ navigation }: Props) => {
 
             saveToken(token);
 
-            navigation.replace('Home');
+            navigation.replace('MainTabs');
 
         } catch (error) {
             const message =
