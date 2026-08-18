@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {
+    Pressable,
     StyleSheet,
     Text,
     View,
@@ -15,21 +16,22 @@ import { Icon } from 'react-native-paper';
 
 type Props = {
     customer: Customer;
-};
-
-const formatMoney = (
-    value?: number,
-): string => {
-    return `${(value ?? 0).toLocaleString(
-        'vi-VN',
-    )} đ`;
+    onPress: () => void;
 };
 
 const CustomerItem = ({
-    customer,
+    customer, onPress
 }: Props) => {
     return (
-        <View style={styles.container}>
+        <Pressable
+            style={({ pressed }) => [
+                styles.container,
+                pressed && {
+                    opacity: 0.7,
+                },
+            ]}
+            onPress={onPress}
+        >
             <View style={styles.info}>
                 <Text style={styles.text}>
                     Customer: {customer.name}
@@ -41,11 +43,9 @@ const CustomerItem = ({
 
                 <Text style={styles.text}>
                     Total money:{' '}
-
                     <Text style={styles.money}>
-                        {formatMoney(
-                            customer.totalSpent,
-                        )}
+                        {(customer.totalSpent ?? 0)
+                            .toLocaleString('vi-VN')} đ
                     </Text>
                 </Text>
             </View>
@@ -58,11 +58,10 @@ const CustomerItem = ({
                 />
 
                 <Text style={styles.loyalty}>
-                    {customer.loyalty ??
-                        'Guest'}
+                    {customer.loyalty ?? 'Guest'}
                 </Text>
             </View>
-        </View>
+        </Pressable>
     );
 };
 

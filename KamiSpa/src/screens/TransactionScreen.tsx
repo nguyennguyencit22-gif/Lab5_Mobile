@@ -3,7 +3,7 @@ import { BottomTabParamList } from "../navigation/types";
 import { useCallback, useState } from "react";
 import { Transaction } from "../models/Transaction";
 import { getAllTransaction } from "../services/transactionService";
-import { Alert } from "react-native";
+import { Alert, Pressable } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native";
@@ -102,6 +102,18 @@ const TransactionScreen = ({ navigation }: Props) => {
                     />
                 )}
             />
+            <Pressable
+                style={styles.addButton}
+                onPress={() =>
+                    navigation
+                        .getParent()
+                        ?.navigate('AddTransaction')
+                }
+            >
+                <Text style={styles.addText}>
+                    +
+                </Text>
+            </Pressable>
         </View>
     );
 }
@@ -116,5 +128,26 @@ const styles = StyleSheet.create({
     },
     listContent: {
         paddingBottom: 80
-    }
+    },
+    addButton: {
+        position: 'absolute',
+        right: 22,
+        bottom: 20,
+
+        width: 55,
+        height: 55,
+
+        borderRadius: 28,
+
+        backgroundColor: COLORS.primary,
+
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    addText: {
+        color: COLORS.white,
+        fontSize: 34,
+        lineHeight: 38,
+    },
 });

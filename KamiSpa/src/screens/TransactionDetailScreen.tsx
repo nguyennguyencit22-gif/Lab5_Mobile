@@ -1,13 +1,14 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamlist } from "../navigation/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Transaction } from "../models/Transaction";
-import { getTransactionById } from "../services/transactionService";
+import { cancelTransaction, getTransactionById } from "../services/transactionService";
 import { Alert, StyleSheet } from "react-native";
 import { View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 import { COLORS } from "../constants/colors";
 import { ScrollView } from "react-native";
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 
 type Props = NativeStackScreenProps<RootStackParamlist, 'TransactionDetail'>;
 
@@ -24,9 +25,14 @@ const formatDate = (date?: string): string => {
     return new Date(date).toLocaleString('vi-VN');
 };
 
-const TransactionDetailScreen = ({ route }: Props) => {
+const TransactionDetailScreen = ({ navigation, route }: Props) => {
 
     const { transactionId } = route.params;
+
+    console.log(
+        'Transaction ID from route:',
+        transactionId,
+    );
 
     const [transaction, setTransaction] = useState<Transaction | null>(null);
 
@@ -53,9 +59,128 @@ const TransactionDetailScreen = ({ route }: Props) => {
         }
     }, [transactionId]);
 
+
+
+    const handleCancelTransaction =
+        useCallback(async () => {
+
+            if (!transaction?._id) {
+                Alert.alert(
+                    'Error',
+                    'Transaction ID not found.',
+                );
+                return;
+            }
+
+            console.log(
+                'ID used for DELETE:',
+                transaction._id,
+            );
+
+            try {
+                await cancelTransaction(
+                    transaction._id,
+                );
+
+                Alert.alert(
+                    'Success',
+                    'Transaction cancelled successfully.',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () =>
+                                navigation.goBack(),
+                        },
+                    ],
+                );
+
+            } catch (error) {
+
+                const message =
+                    error instanceof Error
+                        ? error.message
+                        : 'Cannot cancel transaction.';
+
+                Alert.alert(
+                    'Error',
+                    message,
+                );
+            }
+
+        }, [
+            transaction,
+            navigation,
+        ]);
+
+    const confirmCancel =
+        useCallback(() => {
+
+            Alert.alert(
+                'Warning',
+                'Are you sure you want to cancel this transaction? This will affect the customer transaction information.',
+                [
+                    {
+                        text: 'CANCEL',
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'YES',
+                        style: 'destructive',
+                        onPress:
+                            handleCancelTransaction,
+                    },
+                ],
+            );
+
+        }, [
+            handleCancelTransaction,
+        ]);
+
+
+    const renderHeaderMenu = useCallback(
+        () => (
+            <Menu>
+                <MenuTrigger>
+                    <Text style={styles.menuTrigger}>
+                        ⋮
+                    </Text>
+                </MenuTrigger>
+
+                <MenuOptions>
+                    <MenuOption
+                        text="See more details"
+                    />
+
+                    {transaction?.status !== 'cancelled' && (
+                        <MenuOption
+                            text="Cancel transaction"
+                            onSelect={confirmCancel}
+                        />
+                    )}
+                </MenuOptions>
+            </Menu>
+        ),
+        [
+            transaction,
+            confirmCancel,
+        ],
+    );
+
     useEffect(() => {
         loadTransaction();
     }, [loadTransaction])
+
+    useLayoutEffect(() => {
+
+        navigation.setOptions({
+            headerRight:
+                renderHeaderMenu,
+        });
+
+    }, [
+        navigation,
+        renderHeaderMenu,
+    ]);
 
     if (loading) {
         return (
@@ -84,6 +209,8 @@ const TransactionDetailScreen = ({ route }: Props) => {
     const payment = transaction.price ?? 0;
 
     const discount = payment - amount;
+
+
 
     return (
         <ScrollView
@@ -329,6 +456,12 @@ const styles = StyleSheet.create({
         color: COLORS.primary,
 
         fontSize: 20,
+        fontWeight: '700',
+    },
+    menuTrigger: {
+        paddingHorizontal: 12,
+        color: COLORS.white,
+        fontSize: 28,
         fontWeight: '700',
     },
 });

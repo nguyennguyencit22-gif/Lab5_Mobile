@@ -132,6 +132,16 @@ const CustomerScreen = ({
                 renderItem={({ item }) => (
                     <CustomerItem
                         customer={item}
+                        onPress={() =>
+                            navigation
+                                .getParent()
+                                ?.navigate(
+                                    'CustomerDetail',
+                                    {
+                                        customerId: item._id,
+                                    },
+                                )
+                        }
                     />
                 )}
             />

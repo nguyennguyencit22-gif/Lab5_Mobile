@@ -1,3 +1,4 @@
+import { Customer } from "../models/Customer";
 import { Service } from "../models/Service";
 
 export type BottomTabParamList = {
@@ -24,4 +25,14 @@ export type RootStackParamlist = {
     AddCustomer: undefined;
 
     TransactionDetail: { transactionId: string };
+
+    CustomerDetail: {
+        customerId: string;
+    };
+
+    EditCustomer: {
+        customer: Customer;
+    };
+
+    AddTransaction: undefined;
 };
